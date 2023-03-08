@@ -21,16 +21,14 @@ public:
     void constrainPoint(const int, const int, const float, const float);
 };
 
-Particle::Particle(){
-    pos = Vec2(0, 0);
-    oldpos = Vec2(0, 0);
-    acc = Vec2(0, 0);
-    mass = 1;
-    radius = 5;
-    pinned = false;
-    hidden = false;
-}
-
+/**
+ * @brief Construct a new Particle:: Particle object
+ * 
+ * @param p the initial position of the particle
+ * @param op the old position of the particle, on initialization this determines starting velocity
+ * @param a the starting acceleration of the particle
+ * @param m the mass of the particle
+ */
 Particle::Particle(Vec2 p, Vec2 op, Vec2 a, float m){
     pos = p;
     oldpos = op;
@@ -41,10 +39,36 @@ Particle::Particle(Vec2 p, Vec2 op, Vec2 a, float m){
     hidden = false;
 }
 
+/**
+ * @brief Construct a new Particle:: Particle object
+ * 
+ */
+Particle::Particle(){
+    pos = Vec2(0, 0);
+    oldpos = Vec2(0, 0);
+    acc = Vec2(0, 0);
+    mass = 1;
+    radius = 5;
+    pinned = false;
+    hidden = false;
+}
+
+/**
+ * @brief Destroy the Particle:: Particle object
+ * 
+ */
 Particle::~Particle()
 {
 }
 
+/**
+ * @brief take coordinates of the center of the circle and the radius and draw the circle in the SDL_Renderer
+ * 
+ * @param renderer SDL_Renderer to draw the circle to
+ * @param centerX x coordinate of the circle's center
+ * @param centerY y coordinate of the circle's center
+ * @param r radius of the circle
+ */
 void SDL_RenderDrawCircle(SDL_Renderer* renderer, int centerX, int centerY, int r) {
     const int diameter = (r * 2);
 
@@ -74,6 +98,11 @@ void SDL_RenderDrawCircle(SDL_Renderer* renderer, int centerX, int centerY, int 
     }
 }
 
+/**
+ * @brief render the particle if it's not hidden
+ * 
+ * @param renderer SDL_Renderer to draw the particle to
+ */
 void Particle::render(SDL_Renderer* renderer){
     if(!hidden){
         SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
@@ -81,6 +110,12 @@ void Particle::render(SDL_Renderer* renderer){
     }
 }
 
+/**
+ * @brief calculate the new position of the particle and apply acceleration and gravity, as well as ground friction
+ * 
+ * @param screen_height height of the screen
+ * @param gravity gravity value to apply to the particle
+ */
 void Particle::update(const int screen_height, const float gravity){
     if(!pinned){
         float vx = pos.x - oldpos.x,
@@ -98,6 +133,13 @@ void Particle::update(const int screen_height, const float gravity){
     }
 }
 
+/**
+ * @brief check if the particle is collided with another particle
+ * 
+ * @param other pointer to the other particle
+ * @return true if the particles are colliding
+ * @return false if the particles are not colliding
+ */
 bool Particle::isCollided(Particle* other){
     float dx = pos.x - other->pos.x,
           dy = pos.y - other->pos.y,
@@ -106,7 +148,16 @@ bool Particle::isCollided(Particle* other){
     return distance < radius + other->radius;
 }
 
+/**
+ * @brief recalculate particle's trajectory and position to constrain it to the bounds of the window
+ * 
+ * @param screen_height height of the window
+ * @param screen_width width of the window
+ * @param bounce amount of kinetic energy lost to a bounce
+ * @param air_friction background speed reduction of the particle as it travels
+ */
 void Particle::constrainPoint(const int screen_height, const int screen_width, const float bounce, const float air_friction){
+    //TODO: fix and rework air_friction so that it actually does something
     float vx = (pos.x - oldpos.x) * air_friction,
           vy = (pos.y - oldpos.y) * air_friction;
     if(pos.x + radius > screen_width){

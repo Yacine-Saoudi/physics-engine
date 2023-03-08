@@ -112,6 +112,9 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
+    // initialize physics world
+    PhysicsWorld* world = new PhysicsWorld(SCREEN_HEIGHT, SCREEN_WIDTH, BOUNCE, AIR_RESISTANCE, GRAVITY);
+
     // create array of 5 particles array in the shape of a cube
     std::vector<Particle*> particles;
     std::vector<Stick*> sticks;
@@ -120,25 +123,24 @@ int main(int argc, char* argv[]) {
     Particle* p2 = new Particle(Vec2(SCREEN_WIDTH/2 + 50, SCREEN_HEIGHT/2), Vec2(SCREEN_WIDTH/2 + 50, SCREEN_HEIGHT/2), Vec2(0, 0), 5);
     Particle* p3 = new Particle(Vec2(SCREEN_WIDTH/2 + 50, SCREEN_HEIGHT/2 + 50), Vec2(SCREEN_WIDTH/2 + 50, SCREEN_HEIGHT/2 + 50), Vec2(0, 0), 5);
     Particle* p4 = new Particle(Vec2(SCREEN_WIDTH/2, SCREEN_HEIGHT/2 + 50), Vec2(SCREEN_WIDTH/2, SCREEN_HEIGHT/2 + 50), Vec2(0, 0), 5);
-    particles.push_back(p1);
-    particles.push_back(p2);
-    particles.push_back(p3);
-    particles.push_back(p4);
+    world->particles.push_back(p1);
+    world->particles.push_back(p2);
+    world->particles.push_back(p3);
+    world->particles.push_back(p4);
 
     Stick* s1 = new Stick(p1, p2, 1.0f);
     Stick* s2 = new Stick(p2, p3, 1.0f);
     Stick* s3 = new Stick(p3, p4, 1.0f);
     Stick* s4 = new Stick(p4, p1, 1.0f);
     Stick* s5 = new Stick(p1, p3, 1.0f);
-    sticks.push_back(s1);
-    sticks.push_back(s2);
-    sticks.push_back(s3);
-    sticks.push_back(s4);
-    sticks.push_back(s5);
+    world->sticks.push_back(s1);
+    world->sticks.push_back(s2);
+    world->sticks.push_back(s3);
+    world->sticks.push_back(s4);
+    world->sticks.push_back(s5);
 
     // Event loop
     bool quit = false;
-    bool mouseDown = false;
     while (!quit) {
         SDL_Event event;
         while (SDL_PollEvent(&event)) {
@@ -150,7 +152,7 @@ int main(int argc, char* argv[]) {
                 case SDL_MOUSEBUTTONDOWN: {
                     std::cout << "click" << std::endl;
                     running = true;
-                    thread = std::thread(spawnParticles, &particles);
+                    // thread = std::thread(spawnParticles, &particles);
                     break;
                 }
                 case SDL_MOUSEBUTTONUP: {
@@ -163,39 +165,27 @@ int main(int argc, char* argv[]) {
         }
 
         // if running is false and thread is joinable, join the thread
-        if(!running && thread.joinable()){
-            std::cout << "joining thread" << std::endl;
-            thread.join();
-        }
+        // if(!running && thread.joinable()){
+        //     std::cout << "joining thread" << std::endl;
+        //     thread.join();
+        // }
 
         // clear the renderer
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderClear(renderer);
 
-        // update the position of the circle
-        updateParticles(particles);
+        world->updateParticles();
+        world->updateSticks();
+        world->constrainPoints();
+        world->renderParticles();
+        world->renderSticks();
 
-        // if(mouseDown){
-        //     std::cout << "mouse down" << std::endl;
-        //     // std::vector<Particle*>* temp = &particles;
-        //     // spawnThread = std::thread(spawnParticles, temp);
-        //     spawnParticles(&particles);
-        //     // sleep
-        //     SDL_Delay(100);
-        // }
+        // updateParticles(particles);
+        // updateSticks(sticks);
+        // constrainPoints(particles);
+        // renderParticles(renderer, particles);
+        // renderSticks(renderer, sticks);
 
-
-        // update the position of the sticks
-        updateSticks(sticks);
-        // keep points within the screen
-        constrainPoints(particles);
-
-        // // render circles
-        renderParticles(renderer, particles);
-
-        renderSticks(renderer, sticks);
-
-        // Present the renderer to the screen
         SDL_RenderPresent(renderer);
     }
 
