@@ -1,0 +1,7 @@
+[
+{
+  "directory": "/Users/yacine/Documents/engine/build",
+  "command": "/usr/bin/clang++  -I/opt/homebrew/include -isystem /opt/homebrew/include/SDL2 -I/opt/homebrew/include  -O3 -DNDEBUG -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX12.0.sdk -std=gnu++17 -o CMakeFiles/PhysEng.dir/source/main.cpp.o -c /Users/yacine/Documents/engine/source/main.cpp",
+  "file": "/Users/yacine/Documents/engine/source/main.cpp"
+}
+]

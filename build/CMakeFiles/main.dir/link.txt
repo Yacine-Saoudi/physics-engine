@@ -1,0 +1,1 @@
+/usr/bin/clang++ -I/opt/homebrew/include  -O3 -DNDEBUG -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX12.0.sdk -Wl,-search_paths_first -Wl,-headerpad_max_install_names -L/opt/homebrew/lib  CMakeFiles/main.dir/main.cpp.o -o main   -L/opt/homebrew/lib  -Wl,-rpath,/opt/homebrew/lib /opt/homebrew/lib/libSDL2.dylib 
