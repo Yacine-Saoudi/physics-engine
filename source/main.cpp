@@ -4,89 +4,25 @@
 #include <mutex>
 #include <thread>
 #include <SDL2/SDL.h>
-#include "Stick.hpp"
+#include "PhysicsWorld.hpp"
 
 const int SCREEN_WIDTH = 1280;
 const int SCREEN_HEIGHT = 720;
 const double BOUNCE = 0.8;
 const double AIR_RESISTANCE = 0.8;
 const double GRAVITY = 0.01;
-std::thread thread;
 bool running = false;
+std::thread t1;
 
-std::mutex mutex;
-
-void updateParticles(std::vector<Particle*> particles) {
-    // update the position of the circle using verlet integration
-    for (int i = 0; i < particles.size(); i++) {    
-        if(particles[i]->pinned) continue;
-        Particle* p = particles[i];
-        p->update(SCREEN_HEIGHT, GRAVITY);
-
-    }
-    // for (int i = 0; i < CURR_PARTICLES; i++){
-    //     for(int j = i + 1; j < CURR_PARTICLES; j++){
-    //         if(isCollided(particles[i], entities[j])){
-    //             std::cout << "collision between " << i << " and " << j << std::endl;
-    //             // collision response
-    //             float dx = particles[i].pos.x - entities[j].pos.x;
-    //             float dy = particles[i].pos.y - entities[j].pos.y;
-    //             float distance = sqrt(dx * dx + dy * dy);
-    //             float overlap = (particles[i].radius + entities[j].radius) - distance;
-
-    //             Vec2 normal = Vec2(dx/distance, dy/distance);
-
-    //             particles[i].pos.x += normal.x * (overlap / 2);
-    //             particles[i].pos.y += normal.y * (overlap / 2);
-    //             entities[j].pos.x -= normal.x * (overlap / 2);
-    //             entities[j].pos.y -= normal.y * (overlap / 2);
-    //         }
-    //     }
-    // }
-
-}
-
-void constrainPoints(std::vector<Particle*> particles) {
-        for (int i = 0; i < particles.size(); i++) {
-            Particle* p = particles[i];
-            p->constrainPoint(SCREEN_HEIGHT, SCREEN_WIDTH, BOUNCE, AIR_RESISTANCE);      
-    }
-}
-
-void updateSticks(std::vector<Stick*> sticks) {
-    for(int i = 0; i < sticks.size(); i++){
-        Stick* s = sticks[i];
-        s->update();
-    }
-}
-
-void renderParticles(SDL_Renderer* renderer, std::vector<Particle*> particles) {
-    // render circles as white
-    for (int i = 0; i < particles.size(); i++) {
-        Particle* p = particles[i];
-        p->render(renderer);
-    }
-}
-
-void renderSticks(SDL_Renderer* renderer, std::vector<Stick*> sticks) {
-    // render sticks as white
-    for(int i = 0; i < sticks.size(); i++){
-        Stick* s = sticks[i];
-        s->render(renderer);
-    }
-}
-
-void spawnParticles(std::vector<Particle*>* particles){
-    std::lock_guard<std::mutex> guard(mutex);
-
-    int mouseX, mouseY;
-    float mouseState = SDL_GetMouseState(&mouseX, &mouseY);
+void spawnParticles(PhysicsWorld* world){
+    int mouse_x, mouse_y;
+    float mouseState = SDL_GetMouseState(&mouse_x, &mouse_y);
     while(running){
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
-        float mouseState = SDL_GetMouseState(&mouseX, &mouseY);
-        if(mouseState == 0) continue;
-        Vec2 pos = Vec2(mouseX, mouseY);
-        particles->push_back(new Particle(pos, pos, Vec2(0, 0), 5));
+        this_thread::sleep_for(chrono::milliseconds(300));
+        if(!running) return;
+        float mouseState = SDL_GetMouseState(&mouse_x, &mouse_y);
+        Vec2 pos = Vec2(mouse_x, mouse_y);
+        world->particles.push_back(new Particle(pos, pos, Vec2(0, 0), 5));
     }
     return;
 }
@@ -150,26 +86,17 @@ int main(int argc, char* argv[]) {
                     break;
                 }
                 case SDL_MOUSEBUTTONDOWN: {
-                    std::cout << "click" << std::endl;
                     running = true;
-                    // thread = std::thread(spawnParticles, &particles);
+                    t1 = std::thread(spawnParticles, world);
+                    t1.detach();
                     break;
                 }
                 case SDL_MOUSEBUTTONUP: {
-                    std::cout << "unclick" << std::endl;
                     running = false;
-                    std::cout << "running is false" << std::endl;
                     break;
                 }
             }
         }
-
-        // if running is false and thread is joinable, join the thread
-        // if(!running && thread.joinable()){
-        //     std::cout << "joining thread" << std::endl;
-        //     thread.join();
-        // }
-
         // clear the renderer
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderClear(renderer);
@@ -177,14 +104,8 @@ int main(int argc, char* argv[]) {
         world->updateParticles();
         world->updateSticks();
         world->constrainPoints();
-        world->renderParticles();
-        world->renderSticks();
-
-        // updateParticles(particles);
-        // updateSticks(sticks);
-        // constrainPoints(particles);
-        // renderParticles(renderer, particles);
-        // renderSticks(renderer, sticks);
+        world->renderParticles(renderer);
+        world->renderSticks(renderer);
 
         SDL_RenderPresent(renderer);
     }

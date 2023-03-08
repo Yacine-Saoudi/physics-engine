@@ -24,7 +24,7 @@ public:
     void constrainPoints();
     void renderParticles(SDL_Renderer* renderer);
     void renderSticks(SDL_Renderer* renderer);
-    void spawnParticles(vector<Particle*>* particles);
+    void setRunning(bool r);
 
 };
 
@@ -38,8 +38,6 @@ public:
  * @param g gravity value of the simulation
  */
 PhysicsWorld::PhysicsWorld(int s_h, int s_w, double b, double a_r, double g){
-    vector<Particle*> particles = new vector<Particle*>();
-    vector<Stick*> sticks = new vector<Stick*>();
     screen_height = s_h;
     screen_width = s_w;
     bounce = b;
@@ -52,9 +50,6 @@ PhysicsWorld::PhysicsWorld(int s_h, int s_w, double b, double a_r, double g){
  * 
  */
 PhysicsWorld::PhysicsWorld(){
-    vector<Particle*> particles = new vector<Particle*>();
-    vector<Stick*> sticks = new vector<Stick*>();
-
     screen_width = 1280;
     screen_height = 720;
     bounce = 0.8;
@@ -62,30 +57,15 @@ PhysicsWorld::PhysicsWorld(){
     gravity = 0.01;
 }
 
+void PhysicsWorld::setRunning(bool r){
+    running = r;
+}
+
 /**
  * @brief Destroy the Physics World:: Physics World object
  * 
  */
 PhysicsWorld::~PhysicsWorld(){
-    delete particles;
-    delete sticks;
-}
-
-/**
- * @brief take the current mouse position inside the window then create a new particle at that point
- * 
- * @param particles particles array to spawn particles to
- */
-void PhysicsWorld::spawnParticles(vector<Particle*>* particles){
-    //TODO: lock mutex here if needed
-    int mouse_x, mouse_y;
-    float mouseState = SDL_GetMouseState(&mouse_x, &mouse_y);
-    while(running){
-        this_thread::sleep_for(chrono::milliseconds(500));
-        float mouseState = SDL_GetMouseState(&mouse_x, &mouse_y);
-        Vec2 pos = Vec2(mouse_x, mouse_y);
-        particles->push_back(new Particle(pos, pos, Vec2(0, 0), 5));
-    }
 }
 
 /**

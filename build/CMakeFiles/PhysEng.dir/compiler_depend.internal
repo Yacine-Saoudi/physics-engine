@@ -299,6 +299,7 @@ CMakeFiles/PhysEng.dir/source/main.cpp.o
  /opt/homebrew/include/SDL2/SDL_version.h
  /opt/homebrew/include/SDL2/SDL_locale.h
  /opt/homebrew/include/SDL2/SDL_misc.h
+ /Users/yacine/Documents/engine/source/PhysicsWorld.hpp
  /Users/yacine/Documents/engine/source/Stick.hpp
  /Users/yacine/Documents/engine/source/Particle.hpp
  /Users/yacine/Documents/engine/source/Vec2.hpp

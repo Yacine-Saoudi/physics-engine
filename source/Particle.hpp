@@ -120,16 +120,13 @@ void Particle::update(const int screen_height, const float gravity){
     if(!pinned){
         float vx = pos.x - oldpos.x,
               vy = pos.y - oldpos.y;
-        
+                
         oldpos.x = pos.x;
         oldpos.y = pos.y;
 
         pos.x += vx + acc.x;
         pos.y += vy + acc.y + gravity;
 
-        if(pos.y + radius + vy >= screen_height){
-            pos.x -= vx;
-        }
     }
 }
 
