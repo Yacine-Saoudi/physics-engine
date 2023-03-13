@@ -122,25 +122,22 @@ void PhysicsWorld::updateParticles() {
         p->update(screen_height, gravity);
 
     }
-    // for (int i = 0; i < CURR_PARTICLES; i++){
-    //     for(int j = i + 1; j < CURR_PARTICLES; j++){
-    //         if(isCollided(particles[i], entities[j])){
-    //             std::cout << "collision between " << i << " and " << j << std::endl;
-    //             // collision response
-    //             float dx = particles[i].pos.x - entities[j].pos.x;
-    //             float dy = particles[i].pos.y - entities[j].pos.y;
-    //             float distance = sqrt(dx * dx + dy * dy);
-    //             float overlap = (particles[i].radius + entities[j].radius) - distance;
-
-    //             Vec2 normal = Vec2(dx/distance, dy/distance);
-
-    //             particles[i].pos.x += normal.x * (overlap / 2);
-    //             particles[i].pos.y += normal.y * (overlap / 2);
-    //             entities[j].pos.x -= normal.x * (overlap / 2);
-    //             entities[j].pos.y -= normal.y * (overlap / 2);
-    //         }
-    //     }
-    // }
+    for (int i = 0; i < particles.size(); i++){
+        for(int j = i + 1; j < particles.size(); j++){
+            if(particles[i]->isCollided(particles[j])){
+                std::cout << "collision detected between parti " << i << " and parti " << j << std::endl; 
+                // resolve collision
+                particles[i]->resolveCollision(particles[j]);
+            }
+        }
+        for(int j = 0; j < sticks.size(); j++){
+            if(sticks[j]->isCollided(particles[i])){
+                std::cout << "collision detected between parti " << i << " and stick " << j << std::endl; 
+                // resolve collision
+                sticks[j]->resolveCollision(particles[i]);
+            }
+        }
+    }
 
 }
 

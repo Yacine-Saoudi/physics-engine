@@ -60,29 +60,23 @@ int main(int argc, char* argv[]) {
     Particle* ptwo = new Particle(Vec2(200, 200), Vec2(200, 200), Vec2(0, 0), 5);
     Particle* pthree = new Particle(Vec2(100, 200), Vec2(100, 200), Vec2(0, 0), 5);
     Particle* pfour = new Particle(Vec2(200, 100), Vec2(200, 100), Vec2(0, 0), 5);
-    Particle* pfive = new Particle(Vec2(150, 150), Vec2(150, 150), Vec2(0, 0), 5);
+
+    Particle* above = new Particle(Vec2(150, 50), Vec2(150, 50), Vec2(0, 0), 5);
 
     world->particles.push_back(pone);
     world->particles.push_back(ptwo);
     world->particles.push_back(pthree);
     world->particles.push_back(pfour);
 
-    Particle* pintersect = new Particle(Vec2(150, 150), Vec2(150, 150), Vec2(0, 0), 5);
-    world->particles.push_back(pintersect);
-
-    Particle* pintersectcorner = new Particle(Vec2(100, 100), Vec2(100, 100), Vec2(0, 0), 5);
-    world->particles.push_back(pintersectcorner);
-
-    Particle* notintersect = new Particle(Vec2(300, 300), Vec2(300, 300), Vec2(0, 0), 5);
-    world->particles.push_back(notintersect);
+    world->particles.push_back(above);
 
     // create a stick between the two particles
-    Stick* stickone = new Stick(pone, ptwo, 0.1, 0.8);
-    Stick* sticktwo = new Stick(ptwo, pthree, 0.1, 0.8);
-    Stick* stickthree = new Stick(pthree, pfour, 0.1, 0.8);
-    Stick* stickfour = new Stick(pfour, pone, 0.1, 0.8);
-    Stick* stickfive = new Stick(pone, pthree, 0.1, 0.8);
-    Stick* sticksix = new Stick(ptwo, pfour, 0.1, 0.8);
+    Stick* stickone = new Stick(pone, ptwo, 1, 0.8);
+    Stick* sticktwo = new Stick(ptwo, pthree, 1, 0.8);
+    Stick* stickthree = new Stick(pthree, pfour, 1, 0.8);
+    Stick* stickfour = new Stick(pfour, pone, 1, 0.8);
+    Stick* stickfive = new Stick(pone, pthree, 1, 0.8);
+    Stick* sticksix = new Stick(ptwo, pfour, 1, 0.8);
     
     world->sticks.push_back(stickone);
     world->sticks.push_back(sticktwo);

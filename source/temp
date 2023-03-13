@@ -1,0 +1,23 @@
+ if data:
+            # STICK COLLISION
+            veloB = (Vector2D.Distance(data.obj.pointA.position, 
+            data.obj.pointA.previousPosition) + 
+            Vector2D.Distance(data.obj.pointB.position, 
+            data.obj.pointB.previousPosition))/2
+
+            
+            velo = veloA - veloB
+            velo /= 1.25
+            self.Move(data.hitLoc + (data.normal*velo))
+            veloVector = self.previousPosition - self.position
+            projVelo = Vector2D.Project(veloVector, (data.obj.pointB.position - data.obj.pointA.position).getNormalised())
+            self.previousPosition = data.hitLoc+projVelo
+            
+            fullForce = data.normal*velo
+
+            aAlpha = Vector2D.InverseLerp(data.obj.pointB.position, data.obj.pointA.position, data.hitLoc)
+            bAlpha = 1-aAlpha
+
+            data.obj.pointA.Move(data.obj.pointA.position - (fullForce*aAlpha))
+            data.obj.pointB.Move(data.obj.pointB.position - (fullForce*bAlpha))
+            #self.previousPosition = data.hitLoc

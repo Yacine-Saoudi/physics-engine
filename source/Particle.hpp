@@ -19,6 +19,7 @@ public:
     void update(const int, const float);
     bool isCollided(Particle*);
     void constrainPoint(const int, const int, const float, const float);
+    void resolveCollision(Particle*);
 };
 
 /**
@@ -108,6 +109,25 @@ void Particle::render(SDL_Renderer* renderer){
         SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
         SDL_RenderDrawCircle(renderer, pos.x, pos.y, radius);
     }
+}
+
+void Particle::resolveCollision(Particle* p){
+    float dx = pos.x - p->pos.x;
+    float dy = pos.y - p->pos.y;
+    float distance = sqrt(dx * dx + dy * dy);
+    float overlap = (radius + p->radius) - distance;
+
+    Vec2 normal = Vec2(dx/distance, dy/distance);
+
+    oldpos.x = pos.x - normal.x * overlap;
+    oldpos.y = pos.y - normal.y * overlap;
+    p->oldpos.x = p->pos.x + normal.x * overlap;
+    p->oldpos.y = p->pos.y + normal.y * overlap;
+
+    pos.x += normal.x * (overlap / 2);
+    pos.y += normal.y * (overlap / 2);
+    p->pos.x -= normal.x * (overlap / 2);
+    p->pos.y -= normal.y * (overlap / 2);
 }
 
 /**
