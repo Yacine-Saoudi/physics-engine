@@ -11,6 +11,8 @@ public:
 
     Vec2 normalize();
     float magnitude();
+    Vec2 dot(const Vec2&);
+    float cross(const Vec2&);
 
     Vec2 operator=(const Vec2 &v){
         x = v.x;
@@ -19,6 +21,9 @@ public:
     }
     Vec2 operator/(float f){
         return Vec2(x / f, y / f);
+    }
+    Vec2 operator/(const Vec2 &v){
+        return Vec2(x / v.x, y / v.y);
     }
     Vec2 operator*(float f){
         return Vec2(x * f, y * f);
@@ -87,4 +92,12 @@ Vec2 Vec2::normalize(){
 
 float Vec2::magnitude(){
     return sqrt(x * x + y * y);
+}
+
+Vec2 Vec2::dot(const Vec2& v){
+    return Vec2(x * v.x, y * v.y);
+}
+
+float Vec2::cross(const Vec2& v){
+    return x * v.y - y * v.x;
 }

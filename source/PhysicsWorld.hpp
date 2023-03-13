@@ -9,7 +9,6 @@ private:
     double bounce;
     double air_resistance;
     double gravity;
-    bool running = false;
 public:
 
     vector<Particle*> particles;
@@ -22,9 +21,9 @@ public:
     void updateParticles();
     void updateSticks();
     void constrainPoints();
-    void renderParticles(SDL_Renderer* renderer);
-    void renderSticks(SDL_Renderer* renderer);
-    void setRunning(bool r);
+    void renderParticles(SDL_Renderer*);
+    void renderSticks(SDL_Renderer*);
+    void update(SDL_Renderer*);
 
 };
 
@@ -57,9 +56,6 @@ PhysicsWorld::PhysicsWorld(){
     gravity = 0.01;
 }
 
-void PhysicsWorld::setRunning(bool r){
-    running = r;
-}
 
 /**
  * @brief Destroy the Physics World:: Physics World object
@@ -74,7 +70,6 @@ PhysicsWorld::~PhysicsWorld(){
  * @param renderer SDL_renderer to draw sticks in
  */
 void PhysicsWorld::renderSticks(SDL_Renderer* renderer) {
-    // render the circle
     for (int i = 0; i < sticks.size(); i++) {
         Stick* s = sticks[i];
         s->render(renderer);
@@ -86,7 +81,6 @@ void PhysicsWorld::renderSticks(SDL_Renderer* renderer) {
  * @param renderer SDL_renderer to draw particles in
  */
 void PhysicsWorld::renderParticles(SDL_Renderer* renderer) {
-    // render the circle
     for (int i = 0; i < particles.size(); i++) {
         Particle* p = particles[i];
         p->render(renderer);
@@ -148,4 +142,17 @@ void PhysicsWorld::updateParticles() {
     //     }
     // }
 
+}
+
+/**
+ * @brief update all physics world objects and render them
+ * 
+ * @param renderer renderer to draw objects in
+ */
+void PhysicsWorld::update(SDL_Renderer* renderer) {
+    updateParticles();
+    updateSticks();
+    constrainPoints();
+    renderParticles(renderer);
+    renderSticks(renderer);
 }

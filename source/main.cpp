@@ -55,25 +55,42 @@ int main(int argc, char* argv[]) {
     std::vector<Particle*> particles;
     std::vector<Stick*> sticks;
 
-    Particle* p1 = new Particle(Vec2(SCREEN_WIDTH/2, SCREEN_HEIGHT/2), Vec2(SCREEN_WIDTH/2, SCREEN_HEIGHT/2), Vec2(0, 0), 5);
-    Particle* p2 = new Particle(Vec2(SCREEN_WIDTH/2 + 50, SCREEN_HEIGHT/2), Vec2(SCREEN_WIDTH/2 + 50, SCREEN_HEIGHT/2), Vec2(0, 0), 5);
-    Particle* p3 = new Particle(Vec2(SCREEN_WIDTH/2 + 50, SCREEN_HEIGHT/2 + 50), Vec2(SCREEN_WIDTH/2 + 50, SCREEN_HEIGHT/2 + 50), Vec2(0, 0), 5);
-    Particle* p4 = new Particle(Vec2(SCREEN_WIDTH/2, SCREEN_HEIGHT/2 + 50), Vec2(SCREEN_WIDTH/2, SCREEN_HEIGHT/2 + 50), Vec2(0, 0), 5);
-    world->particles.push_back(p1);
-    world->particles.push_back(p2);
-    world->particles.push_back(p3);
-    world->particles.push_back(p4);
+    // create particles in the shape of a box to test if collision detection between stick and particle works
+    Particle* pone = new Particle(Vec2(100, 100), Vec2(100, 100), Vec2(0, 0), 5);
+    Particle* ptwo = new Particle(Vec2(200, 200), Vec2(200, 200), Vec2(0, 0), 5);
+    Particle* pthree = new Particle(Vec2(100, 200), Vec2(100, 200), Vec2(0, 0), 5);
+    Particle* pfour = new Particle(Vec2(200, 100), Vec2(200, 100), Vec2(0, 0), 5);
+    Particle* pfive = new Particle(Vec2(150, 150), Vec2(150, 150), Vec2(0, 0), 5);
 
-    Stick* s1 = new Stick(p1, p2, 1.0f);
-    Stick* s2 = new Stick(p2, p3, 1.0f);
-    Stick* s3 = new Stick(p3, p4, 1.0f);
-    Stick* s4 = new Stick(p4, p1, 1.0f);
-    Stick* s5 = new Stick(p1, p3, 1.0f);
-    world->sticks.push_back(s1);
-    world->sticks.push_back(s2);
-    world->sticks.push_back(s3);
-    world->sticks.push_back(s4);
-    world->sticks.push_back(s5);
+    world->particles.push_back(pone);
+    world->particles.push_back(ptwo);
+    world->particles.push_back(pthree);
+    world->particles.push_back(pfour);
+
+    Particle* pintersect = new Particle(Vec2(150, 150), Vec2(150, 150), Vec2(0, 0), 5);
+    world->particles.push_back(pintersect);
+
+    Particle* pintersectcorner = new Particle(Vec2(100, 100), Vec2(100, 100), Vec2(0, 0), 5);
+    world->particles.push_back(pintersectcorner);
+
+    Particle* notintersect = new Particle(Vec2(300, 300), Vec2(300, 300), Vec2(0, 0), 5);
+    world->particles.push_back(notintersect);
+
+    // create a stick between the two particles
+    Stick* stickone = new Stick(pone, ptwo, 0.1, 0.8);
+    Stick* sticktwo = new Stick(ptwo, pthree, 0.1, 0.8);
+    Stick* stickthree = new Stick(pthree, pfour, 0.1, 0.8);
+    Stick* stickfour = new Stick(pfour, pone, 0.1, 0.8);
+    Stick* stickfive = new Stick(pone, pthree, 0.1, 0.8);
+    Stick* sticksix = new Stick(ptwo, pfour, 0.1, 0.8);
+    
+    world->sticks.push_back(stickone);
+    world->sticks.push_back(sticktwo);
+    world->sticks.push_back(stickthree);
+    world->sticks.push_back(stickfour);
+    world->sticks.push_back(stickfive);
+    world->sticks.push_back(sticksix);
+    
 
     // Event loop
     bool quit = false;
@@ -101,11 +118,12 @@ int main(int argc, char* argv[]) {
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderClear(renderer);
 
-        world->updateParticles();
-        world->updateSticks();
-        world->constrainPoints();
-        world->renderParticles(renderer);
-        world->renderSticks(renderer);
+        // std::cout << "isCollided: " << stick->isCollided(pintersect) << std::endl;
+        // std::cout << "corner: " << stick->isCollided(pintersectcorner) << std::endl;
+        // std::cout << "not: " << stick->isCollided(notintersect) << std::endl;
+
+
+        world->update(renderer);
 
         SDL_RenderPresent(renderer);
     }
