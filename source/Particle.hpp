@@ -35,7 +35,7 @@ Particle::Particle(Vec2 p, Vec2 op, Vec2 a, float m){
     oldpos = op;
     acc = a;
     mass = m;
-    radius = 10;
+    radius = 1;
     pinned = false;
     hidden = false;
 }
@@ -49,7 +49,7 @@ Particle::Particle(){
     oldpos = Vec2(0, 0);
     acc = Vec2(0, 0);
     mass = 1;
-    radius = 5;
+    radius = 1;
     pinned = false;
     hidden = false;
 }
@@ -111,23 +111,25 @@ void Particle::render(SDL_Renderer* renderer){
     }
 }
 
+
+/**
+ * @brief resolve the collision between two particles
+ * 
+ * @param p other particle to resolve collision with
+ */
 void Particle::resolveCollision(Particle* p){
-    float dx = pos.x - p->pos.x;
-    float dy = pos.y - p->pos.y;
-    float distance = sqrt(dx * dx + dy * dy);
-    float overlap = (radius + p->radius) - distance;
+    Vec2 relVel = Vec2(pos - p->pos);
+    float minDist = radius + p->radius;
+    float dist = sqrt(relVel.x * relVel.x + relVel.y * relVel.y);
 
-    Vec2 normal = Vec2(dx/distance, dy/distance);
+    Vec2 normal = relVel.normalize();
 
-    oldpos.x = pos.x - normal.x * overlap;
-    oldpos.y = pos.y - normal.y * overlap;
-    p->oldpos.x = p->pos.x + normal.x * overlap;
-    p->oldpos.y = p->pos.y + normal.y * overlap;
+    float mass_ratio_1 = radius / (radius + p->radius);
+    float mass_ratio_2 = p->radius / (radius + p->radius);
+    float delta = 0.5f * (dist - minDist);
 
-    pos.x += normal.x * (overlap / 2);
-    pos.y += normal.y * (overlap / 2);
-    p->pos.x -= normal.x * (overlap / 2);
-    p->pos.y -= normal.y * (overlap / 2);
+    pos -= normal * (delta * mass_ratio_1);
+    p->pos += normal * (delta * mass_ratio_2);
 }
 
 /**
@@ -158,6 +160,7 @@ void Particle::update(const int screen_height, const float gravity){
  * @return false if the particles are not colliding
  */
 bool Particle::isCollided(Particle* other){
+
     float dx = pos.x - other->pos.x,
           dy = pos.y - other->pos.y,
           distance = sqrt(dx * dx + dy * dy);

@@ -18,7 +18,6 @@ void spawnParticles(PhysicsWorld* world){
     int mouse_x, mouse_y;
     float mouseState = SDL_GetMouseState(&mouse_x, &mouse_y);
     while(running){
-        this_thread::sleep_for(chrono::milliseconds(300));
         if(!running) return;
         float mouseState = SDL_GetMouseState(&mouse_x, &mouse_y);
         Vec2 pos = Vec2(mouse_x, mouse_y);
@@ -27,66 +26,63 @@ void spawnParticles(PhysicsWorld* world){
     return;
 }
 
+void cutSticks(PhysicsWorld* world){
+    int mouse_x, mouse_y;
+    // float mouseState = SDL_GetMouseState(&mouse_x, &mouse_y);
+    while(running){
+        SDL_GetMouseState(&mouse_x, &mouse_y);
+        Vec2 pos = Vec2(mouse_x, mouse_y);
+        world->cutSticks(pos);
+    }
+    return;
+}
+
 int main(int argc, char* argv[]) {
-    // Initialize SDL2
     if (SDL_Init(SDL_INIT_VIDEO) < 0) {
         std::cerr << "Error initializing SDL: " << SDL_GetError() << std::endl;
         return 1;
     }
 
-    // Create a window
     SDL_Window* window = SDL_CreateWindow("PhysEng", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
     if (!window) {
         std::cerr << "Error creating window: " << SDL_GetError() << std::endl;
         return 1;
     }
 
-    // Create a renderer
     SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
     if (!renderer) {
         std::cerr << "Error creating renderer: " << SDL_GetError() << std::endl;
         return 1;
     }
 
-    // initialize physics world
     PhysicsWorld* world = new PhysicsWorld(SCREEN_HEIGHT, SCREEN_WIDTH, BOUNCE, AIR_RESISTANCE, GRAVITY);
 
-    // create array of 5 particles array in the shape of a cube
-    std::vector<Particle*> particles;
-    std::vector<Stick*> sticks;
+    const int NUM_PARTICLES = 20;
 
-    // create particles in the shape of a box to test if collision detection between stick and particle works
-    Particle* pone = new Particle(Vec2(100, 100), Vec2(100, 100), Vec2(0, 0), 5);
-    Particle* ptwo = new Particle(Vec2(200, 200), Vec2(200, 200), Vec2(0, 0), 5);
-    Particle* pthree = new Particle(Vec2(100, 200), Vec2(100, 200), Vec2(0, 0), 5);
-    Particle* pfour = new Particle(Vec2(200, 100), Vec2(200, 100), Vec2(0, 0), 5);
+    for(int i = 0; i < NUM_PARTICLES; i++){
+        for(int j = 0; j < NUM_PARTICLES; j++){
+            Particle* p = new Particle(Vec2(300 + i * 10, 100 + j * 10), Vec2(300 + i * 10, 100 + j * 10), Vec2(0, 0), 5);
+            world->particles.push_back(p);
+            if(j == 0){
+                p->pinned = true;
+            }
+            
+        }
+    }
 
-    Particle* above = new Particle(Vec2(150, 50), Vec2(150, 50), Vec2(0, 0), 5);
+    for(int i = 0; i < NUM_PARTICLES; i++){
+        for(int j = 0; j < NUM_PARTICLES; j++){
+            if(i < NUM_PARTICLES - 1){
+                Stick* s = new Stick(world->particles[i * NUM_PARTICLES + j], world->particles[(i + 1) * NUM_PARTICLES + j], 0.6, 0.8);
+                world->sticks.push_back(s);
+            }
+            if(j < NUM_PARTICLES - 1){
+                Stick* s = new Stick(world->particles[i * NUM_PARTICLES + j], world->particles[i * NUM_PARTICLES + j + 1], 0.6, 0.8);
+                world->sticks.push_back(s);
+            }
+        }
+    }
 
-    world->particles.push_back(pone);
-    world->particles.push_back(ptwo);
-    world->particles.push_back(pthree);
-    world->particles.push_back(pfour);
-
-    world->particles.push_back(above);
-
-    // create a stick between the two particles
-    Stick* stickone = new Stick(pone, ptwo, 1, 0.8);
-    Stick* sticktwo = new Stick(ptwo, pthree, 1, 0.8);
-    Stick* stickthree = new Stick(pthree, pfour, 1, 0.8);
-    Stick* stickfour = new Stick(pfour, pone, 1, 0.8);
-    Stick* stickfive = new Stick(pone, pthree, 1, 0.8);
-    Stick* sticksix = new Stick(ptwo, pfour, 1, 0.8);
-    
-    world->sticks.push_back(stickone);
-    world->sticks.push_back(sticktwo);
-    world->sticks.push_back(stickthree);
-    world->sticks.push_back(stickfour);
-    world->sticks.push_back(stickfive);
-    world->sticks.push_back(sticksix);
-    
-
-    // Event loop
     bool quit = false;
     while (!quit) {
         SDL_Event event;
@@ -98,7 +94,7 @@ int main(int argc, char* argv[]) {
                 }
                 case SDL_MOUSEBUTTONDOWN: {
                     running = true;
-                    t1 = std::thread(spawnParticles, world);
+                    t1 = std::thread(cutSticks, world);
                     t1.detach();
                     break;
                 }
@@ -108,21 +104,13 @@ int main(int argc, char* argv[]) {
                 }
             }
         }
-        // clear the renderer
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderClear(renderer);
-
-        // std::cout << "isCollided: " << stick->isCollided(pintersect) << std::endl;
-        // std::cout << "corner: " << stick->isCollided(pintersectcorner) << std::endl;
-        // std::cout << "not: " << stick->isCollided(notintersect) << std::endl;
-
 
         world->update(renderer);
 
         SDL_RenderPresent(renderer);
     }
-
-    // Clean up and exit
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
     SDL_Quit();

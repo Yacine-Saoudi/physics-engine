@@ -24,6 +24,7 @@ public:
     void renderParticles(SDL_Renderer*);
     void renderSticks(SDL_Renderer*);
     void update(SDL_Renderer*);
+    void cutSticks(Vec2);
 
 };
 
@@ -62,6 +63,19 @@ PhysicsWorld::PhysicsWorld(){
  * 
  */
 PhysicsWorld::~PhysicsWorld(){
+}
+
+/**
+ * @brief check if a given position is touching any of the sticks in the sticks array and erase the stick if it is
+ * 
+ * @param pos position to check
+ */
+void PhysicsWorld::cutSticks(Vec2 pos){
+    for(int i = 0; i < sticks.size(); i++){
+        if(sticks[i]->isTouching(pos)){
+            sticks.erase(sticks.begin() + i);
+        }
+    }
 }
 
 /**
@@ -125,16 +139,7 @@ void PhysicsWorld::updateParticles() {
     for (int i = 0; i < particles.size(); i++){
         for(int j = i + 1; j < particles.size(); j++){
             if(particles[i]->isCollided(particles[j])){
-                std::cout << "collision detected between parti " << i << " and parti " << j << std::endl; 
-                // resolve collision
                 particles[i]->resolveCollision(particles[j]);
-            }
-        }
-        for(int j = 0; j < sticks.size(); j++){
-            if(sticks[j]->isCollided(particles[i])){
-                std::cout << "collision detected between parti " << i << " and stick " << j << std::endl; 
-                // resolve collision
-                sticks[j]->resolveCollision(particles[i]);
             }
         }
     }
