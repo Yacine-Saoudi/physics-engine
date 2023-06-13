@@ -31,6 +31,15 @@ Stick::Stick(){
     damping = 1;
 }
 
+/**
+ * @brief Construct a new Stick:: Stick object
+ * 
+ * @param p1 the first particle of the stick
+ * @param p2 the second particle of the stick
+ * @param l the length the stick will maintin
+ * @param r the rigidity of the stick
+ * @param d how much damping the stick will use to maintain size
+ */
 Stick::Stick(Particle* p1, Particle* p2, float r, float d){
     this->p1 = p1;
     this->p2 = p2;
@@ -83,7 +92,7 @@ void Stick::resolveCollision(Particle* p){
     Vec2 stick_velocity = (p1Vel + p2Vel) / 2.0f;
     Vec2 velocity_change = (stick_velocity - particle_velocity) * rigidity * damping;
 
-    // if stick velocity is 0, then the stick is not moving and the particle's acceleration should 
+    // if stick velocity is 0, then the stick is not moving and the particle's acceleration should
     if(stick_velocity.magnitude() <= 0.1) return;
 
     // if the particle is pinned, apply the velocity change to the stick

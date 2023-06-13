@@ -8,8 +8,8 @@
 
 const int SCREEN_WIDTH = 1280;
 const int SCREEN_HEIGHT = 720;
-const double BOUNCE = 0.8;
-const double AIR_RESISTANCE = 0.8;
+const double BOUNCE = 0.4;
+const double AIR_RESISTANCE = 0.1;
 const double GRAVITY = 0.01;
 bool running = false;
 std::thread t1;
@@ -57,11 +57,12 @@ int main(int argc, char* argv[]) {
 
     PhysicsWorld* world = new PhysicsWorld(SCREEN_HEIGHT, SCREEN_WIDTH, BOUNCE, AIR_RESISTANCE, GRAVITY);
 
-    const int NUM_PARTICLES = 20;
+    const int NUM_PARTICLES = 60;
 
     for(int i = 0; i < NUM_PARTICLES; i++){
         for(int j = 0; j < NUM_PARTICLES; j++){
-            Particle* p = new Particle(Vec2(300 + i * 10, 100 + j * 10), Vec2(300 + i * 10, 100 + j * 10), Vec2(0, 0), 5);
+            const int GRID_SIZE = 10;
+            Particle* p = new Particle(Vec2(10 + i * GRID_SIZE, 10 + j * GRID_SIZE), Vec2(10 + i * GRID_SIZE, 10 + j * GRID_SIZE), Vec2(0, 0), 5);
             world->particles.push_back(p);
             if(j == 0){
                 p->pinned = true;
@@ -73,11 +74,11 @@ int main(int argc, char* argv[]) {
     for(int i = 0; i < NUM_PARTICLES; i++){
         for(int j = 0; j < NUM_PARTICLES; j++){
             if(i < NUM_PARTICLES - 1){
-                Stick* s = new Stick(world->particles[i * NUM_PARTICLES + j], world->particles[(i + 1) * NUM_PARTICLES + j], 0.6, 0.8);
+                Stick* s = new Stick(world->particles[i * NUM_PARTICLES + j], world->particles[(i + 1) * NUM_PARTICLES + j], 1, 1.5);
                 world->sticks.push_back(s);
             }
             if(j < NUM_PARTICLES - 1){
-                Stick* s = new Stick(world->particles[i * NUM_PARTICLES + j], world->particles[i * NUM_PARTICLES + j + 1], 0.6, 0.8);
+                Stick* s = new Stick(world->particles[i * NUM_PARTICLES + j], world->particles[i * NUM_PARTICLES + j + 1], 1, 1.5);
                 world->sticks.push_back(s);
             }
         }
